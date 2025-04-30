@@ -34,9 +34,10 @@ This project implements a 1D quantum harmonic oscillator simulation and trains b
      - Enhances the model's ability to learn physically consistent representations
    
    - **Learnable Unitary Transformations**:
-     - Allows the network to discover optimized measurement strategies
-     - Maintains physical constraints while enabling adaptability
-     - Bridges quantum mechanical formalism with deep learning capabilities
+     - While learnable unitary transformations have been studied in contexts like unitary RNNs and variational quantum algorithms, our implementation takes a different approach by integrating these directly into classical neural networks specifically for quantum measurement optimization in phase space
+     - Enables the network to discover optimized measurement strategies through data-driven learning rather than using fixed transformations
+     - Maintains physical constraints (unitarity) while potentially revealing more efficient ways to extract information from quantum states
+     - To our knowledge, this specific application to quantum measurement basis optimization is a unique contribution
    
    - **Multiple Measurement Bases**:
      - Extends beyond traditional position-momentum duality
