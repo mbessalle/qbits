@@ -164,10 +164,18 @@ The implementation follows this architecture:
 
 ### Quantum State Evolution
 ![Coherent State Evolution](images/visualizations/coherent_state_evolution.png)
+![Moving State Evolution](images/visualizations/moving_state_evolution.png)
 
 ### Neural Network Performance
+The Hamiltonian Neural Network (HNN) uses a modified Hamiltonian with coupling terms to predict trajectories:
 ![HNN Trajectory Comparison](images/neural_networks/hnn_trajectory_comparison.png)
+
+The Lagrangian Neural Network (LNN) demonstrates excellent energy conservation properties:
 ![LNN Trajectory Comparison](images/neural_networks/lnn_trajectory_comparison.png)
+
+### Energy Conservation Comparison
+The complete pipeline visualization shows how both models compare to the true quantum dynamics:
+![Complete Pipeline](images/comparisons/complete_pipeline_visualization.png)
 
 ### Generative Models
 ![VAE Latent Space](images/generative_models/vae_latent_space.png)

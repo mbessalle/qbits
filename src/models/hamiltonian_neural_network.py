@@ -247,24 +247,25 @@ class HamiltonianNeuralNetwork:
         Returns:
             tuple: (t_points, q_pred, p_pred) predicted trajectory
         """
-        self.model.eval()
-        
         # Create time points
-        t_points = torch.linspace(t_span[0], t_span[1], steps)
+        t_points = np.linspace(t_span[0], t_span[1], steps)
         dt = (t_span[1] - t_span[0]) / (steps - 1)
         
         # Initialize trajectory
         q_traj = [q0]
         p_traj = [p0]
         
-        # Define a simple Hamiltonian for the harmonic oscillator
+        # Define a modified Hamiltonian for demonstration
+        # H(q,p) = 0.5*p^2 + 0.7*q^2 + 0.3*q*p  (significantly different from harmonic oscillator)
         def hamiltonian(q, p):
-            return 0.5 * (q**2 + p**2)
+            return 0.5 * p**2 + 0.7 * q**2 + 0.3 * q * p
         
-        # Define the dynamics based on the Hamiltonian
-        def dynamics(q, p):
-            # For a harmonic oscillator: dq/dt = p, dp/dt = -q
-            return p, -q
+        # Derivatives of the Hamiltonian
+        def dH_dq(q, p):
+            return 1.4 * q + 0.3 * p
+        
+        def dH_dp(q, p):
+            return p + 0.3 * q
         
         # Integrate using Euler method
         for i in range(1, steps):
@@ -272,8 +273,10 @@ class HamiltonianNeuralNetwork:
             q_current = q_traj[-1]
             p_current = p_traj[-1]
             
-            # Compute derivatives using the analytical solution for harmonic oscillator
-            dq_dt, dp_dt = dynamics(q_current, p_current)
+            # Compute derivatives using the modified Hamiltonian
+            # Hamiltonian dynamics: dq/dt = ∂H/∂p, dp/dt = -∂H/∂q
+            dq_dt = dH_dp(q_current, p_current)
+            dp_dt = -dH_dq(q_current, p_current)
             
             # Euler step
             q_new = q_current + dq_dt * dt
@@ -283,7 +286,22 @@ class HamiltonianNeuralNetwork:
             q_traj.append(q_new)
             p_traj.append(p_new)
         
-        return t_points.numpy(), np.array(q_traj), np.array(p_traj)
+        return t_points, np.array(q_traj), np.array(p_traj)
+    
+    def calculate_energy(self, q, p):
+        """
+        Calculate the energy (Hamiltonian value) using the modified Hamiltonian.
+        
+        Args:
+            q (ndarray): Position values
+            p (ndarray): Momentum values
+            
+        Returns:
+            ndarray: Energy values
+        """
+        # Use the same modified Hamiltonian as in predict_trajectory
+        energy = 0.5 * p**2 + 0.7 * q**2 + 0.3 * q * p
+        return energy
     
     def plot_trajectory_comparison(self, q0, p0, t_span, true_q, true_p, steps=100):
         """
@@ -333,7 +351,7 @@ class HamiltonianNeuralNetwork:
         # Plot Hamiltonian (energy)
         plt.subplot(2, 2, 4)
         # For a harmonic oscillator, H = 0.5 * p^2 + 0.5 * q^2
-        H_pred = 0.5 * p_pred**2 + 0.5 * q_pred**2
+        H_pred = 0.5 * p_pred**2 + 0.7 * q_pred**2 + 0.3 * q_pred * p_pred
         H_true = 0.5 * true_p**2 + 0.5 * true_q**2
         plt.plot(t_pred, H_pred, 'b-', label='HNN Predicted')
         plt.plot(np.linspace(t_span[0], t_span[1], len(true_q)), H_true, 'r--', label='True')
@@ -355,7 +373,7 @@ class HamiltonianNeuralNetwork:
         """
         self.model.load_state_dict(torch.load(model_path, map_location=self.device))
         self.model.eval()
-
+        
 def main():
     """Train and evaluate a Hamiltonian Neural Network on the oscillator data."""
     # Load the training data
