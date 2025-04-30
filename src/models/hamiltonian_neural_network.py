@@ -343,7 +343,7 @@ class HamiltonianNeuralNetwork:
         plt.title('Energy Conservation')
         
         plt.tight_layout()
-        plt.savefig('hnn_trajectory_comparison.png')
+        plt.savefig('images/neural_networks/hnn_trajectory_comparison.png')
         plt.close()
         
     def load_model(self, model_path):

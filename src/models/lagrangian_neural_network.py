@@ -352,7 +352,7 @@ class LagrangianNeuralNetwork:
         plt.title('Energy Conservation')
         
         plt.tight_layout()
-        plt.savefig('lnn_trajectory_comparison.png')
+        plt.savefig('images/neural_networks/lnn_trajectory_comparison.png')
         plt.close()
         
     def load_model(self, model_path):
