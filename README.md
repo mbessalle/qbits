@@ -27,10 +27,26 @@ This project implements a 1D quantum harmonic oscillator simulation and trains b
      - Demonstrates superior energy conservation compared to HNN
      - Uses symplectic integration for trajectory prediction
 
-3. **Measurement Module**:
-   - Transforms between position and momentum space using FFT
-   - Calculates quantum observables (position, momentum, energy, etc.)
-   - Implements Pauli X and Z expectation values
+3. **Novel Quantum Measurement Approaches**:
+   - **Neural Network-Integrated Fourier Transforms**:
+     - Implements Fourier transforms as dedicated neural network layers
+     - Provides physics-informed basis changes between position and momentum
+     - Enhances the model's ability to learn physically consistent representations
+   
+   - **Learnable Unitary Transformations**:
+     - Allows the network to discover optimized measurement strategies
+     - Maintains physical constraints while enabling adaptability
+     - Bridges quantum mechanical formalism with deep learning capabilities
+   
+   - **Multiple Measurement Bases**:
+     - Extends beyond traditional position-momentum duality
+     - Enables flexible analysis of quantum states through complementary observables
+     - Extracts different types of information from the same quantum state
+   
+   - **Fourier Recurrent Unit (FRU)**:
+     - Novel RNN architecture leveraging Fourier basis functions
+     - Efficiently captures oscillatory patterns in quantum dynamics
+     - Specialized for processing temporal information in periodic systems
 
 4. **Generative Models**:
    - **Variational Autoencoder (VAE)** for quantum states

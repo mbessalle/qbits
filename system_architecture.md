@@ -17,8 +17,15 @@
           │
           ▼
   ┌────────────────────────────┐
-  │   Measurement Operator     │ ← Phase space duality via FFT / learned unitary
-  │   (e.g. FFT of latent φ)   │
+  │   Fourier Recurrent Unit  │ ← **FRU for efficient spectral processing**
+  │   (FRU)                    │ ← **Multi-resolution analysis**
+  └────────┬───────────────────┘
+           │
+           ▼
+  ┌────────────────────────────┐
+  │   Measurement Operator     │ ← **Novel Fourier Transform** for phase space duality
+  │   (e.g. FFT of latent φ)   │ ← **Learned Unitary Transformation** for efficient computation
+  │   Multiple Measurement Bases│ ← **Adaptive basis selection** for enhanced expressibility
   └────────┬───────────────────┘
            │
            ▼

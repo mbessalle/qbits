@@ -1,0 +1,5 @@
+QBits: Quantum Harmonic Oscillator with Physics-Informed Neural Networks
+
+A comprehensive framework for quantum simulation featuring novel approaches to quantum measurements through neural network-integrated Fourier transforms, learnable unitary transformations, and the innovative Fourier Recurrent Unit (FRU). Demonstrates superior energy conservation with Lagrangian Neural Networks and includes advanced visualization tools for quantum dynamics.
+
+Keywords: quantum-computing, neural-networks, hamiltonian-neural-networks, lagrangian-neural-networks, fourier-transforms, unitary-transformations, physics-informed-machine-learning

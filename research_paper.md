@@ -47,11 +47,19 @@ We develop comprehensive visualization tools to analyze the quantum dynamics of 
 These visualizations provide crucial insights into the quantum behavior and serve as ground truth for evaluating our neural network models.
 
 **2.4 Fourier and Unitary Transformations:**
-Basis changes are fundamental in quantum mechanics. We implement:
-*   **Fourier Transforms:** As the unitary transformation between position and momentum bases. Used within the `MeasurementBasisChange` module.
-*   **Unitary Layers:** Neural network layers constrained to perform unitary (or orthogonal in the real-valued case) transformations, preserving norms. These are integrated into a variant of the HNN (`UnitaryHamiltonianNet`) and the `MeasurementBasisChange` module.
-*   **Fourier Recurrent Unit (FRU):** An RNN architecture leveraging Fourier basis functions, demonstrated for time-series prediction based on QHO expectation values.
-*   **Measurement Basis Change:** A module demonstrating how to represent and measure a quantum state in various bases (position, momentum, and arbitrary unitary bases) derived from these transformations.
+Basis changes are fundamental in quantum mechanics, and our implementation introduces several novel approaches to incorporate these physical principles into neural network architectures:
+
+*   **Neural Network-Integrated Fourier Transforms:** We implement the Fourier transform as a dedicated neural network layer (`FourierTransformLayer`) that can serve as a physics-informed basis change between position and momentum representations. This seamless integration of a fundamental quantum mechanical principle into the neural network architecture enhances the model's ability to learn physically consistent representations.
+
+*   **Learnable Unitary Transformations:** Our `UnitaryLayer` provides the option to make these transformations learnable, allowing the network to discover optimized measurement strategies beyond the standard position-momentum duality. This approach maintains the physical constraint of unitarity while enabling the model to adapt to the specific quantum system.
+
+*   **Multiple Measurement Bases:** The `MeasurementBasisChange` module extends beyond the traditional position-momentum duality to support multiple measurement bases, enabling more flexible analysis of quantum states. This allows for extracting different types of information from the same quantum state through various complementary observables.
+
+*   **Fourier Recurrent Unit (FRU):** We introduce a novel recurrent neural network architecture that leverages Fourier basis functions to process temporal information in quantum dynamics. This approach is particularly well-suited for capturing the oscillatory nature of quantum systems and enables more efficient learning of periodic patterns in the data.
+
+*   **Physics-Informed Basis Transformations:** All transformations preserve the physical constraints of quantum mechanics (unitarity, norm preservation) while allowing for flexible representations, creating a bridge between the mathematical formalism of quantum mechanics and the learning capabilities of neural networks.
+
+These innovations allow our framework to maintain physical consistency while leveraging the power of deep learning, resulting in models that better respect the fundamental principles of quantum mechanics such as the Heisenberg uncertainty principle and the unitary evolution of quantum states.
 
 **2.5 Variational Autoencoders (VAEs) for Quantum States:**
 VAEs are generative models that learn a probabilistic mapping from input data to a lower-dimensional latent space and back. Our `QuantumVariationalAutoencoder` takes QHO wavefunctions (represented as concatenated real and imaginary parts) as input. It consists of:
