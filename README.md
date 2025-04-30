@@ -170,8 +170,12 @@ The implementation follows this architecture:
 The Hamiltonian Neural Network (HNN) uses a modified Hamiltonian with coupling terms to predict trajectories:
 ![HNN Trajectory Comparison](images/neural_networks/hnn_trajectory_comparison.png)
 
+Interestingly, our experiments reveal that the HNN produces more accurate phase space trajectories compared to the LNN, despite using different initial conditions. This suggests that the Hamiltonian formulation is particularly well-suited for quantum systems where phase space representation is critical.
+
 The Lagrangian Neural Network (LNN) demonstrates excellent energy conservation properties:
 ![LNN Trajectory Comparison](images/neural_networks/lnn_trajectory_comparison.png)
+
+While the LNN excels at energy conservation due to its symplectic integration method, the HNN's direct formulation in phase space variables (position and momentum) gives it an advantage in reproducing the characteristic closed orbits of the harmonic oscillator.
 
 ### Energy Conservation Comparison
 The complete pipeline visualization shows how both models compare to the true quantum dynamics:
