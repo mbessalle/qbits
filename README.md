@@ -6,7 +6,7 @@
 
 This project implements a 1D quantum harmonic oscillator simulation and trains both Hamiltonian Neural Networks (HNN) and Lagrangian Neural Networks (LNN) to emulate its evolution. It demonstrates how physics-informed neural networks can learn quantum dynamics while preserving important physical constraints like energy conservation.
 
-![Energy Conservation Comparison](images/comparisons/energy_conservation_comparison.png)
+![Complete Pipeline Visualization](images/comparisons/complete_pipeline_visualization.png)
 
 ## Features
 
@@ -166,7 +166,8 @@ The implementation follows this architecture:
 ![Coherent State Evolution](images/visualizations/coherent_state_evolution.png)
 
 ### Neural Network Performance
-![HNN vs LNN Comparison](images/neural_networks/hnn_trajectory_comparison.png)
+![HNN Trajectory Comparison](images/neural_networks/hnn_trajectory_comparison.png)
+![LNN Trajectory Comparison](images/neural_networks/lnn_trajectory_comparison.png)
 
 ### Generative Models
 ![VAE Latent Space](images/generative_models/vae_latent_space.png)
