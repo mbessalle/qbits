@@ -1,0 +1,186 @@
+# QBits: Quantum Harmonic Oscillator with Physics-Informed Neural Networks
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
+[![PyTorch](https://img.shields.io/badge/PyTorch-1.9+-red.svg)](https://pytorch.org/)
+
+This project implements a 1D quantum harmonic oscillator simulation and trains both Hamiltonian Neural Networks (HNN) and Lagrangian Neural Networks (LNN) to emulate its evolution. It demonstrates how physics-informed neural networks can learn quantum dynamics while preserving important physical constraints like energy conservation.
+
+![Energy Conservation Comparison](images/comparisons/energy_conservation_comparison.png)
+
+## Features
+
+1. **Quantum Harmonic Oscillator Simulation**:
+   - Solves the Schrödinger equation for the harmonic oscillator
+   - Calculates position, momentum, and energy expectation values
+   - Visualizes wavefunction evolution
+
+2. **Physics-Informed Neural Networks**:
+   - **Hamiltonian Neural Network (HNN)**:
+     - Learns the Hamiltonian function H(q,p) from data
+     - Preserves the symplectic structure of Hamiltonian dynamics
+     - Predicts phase space trajectories
+   
+   - **Lagrangian Neural Network (LNN)**:
+     - Learns the Lagrangian function L(q,q̇) from data
+     - Enforces the Euler-Lagrange equations
+     - Demonstrates superior energy conservation compared to HNN
+     - Uses symplectic integration for trajectory prediction
+
+3. **Measurement Module**:
+   - Transforms between position and momentum space using FFT
+   - Calculates quantum observables (position, momentum, energy, etc.)
+   - Implements Pauli X and Z expectation values
+
+4. **Generative Models**:
+   - **Variational Autoencoder (VAE)** for quantum states
+   - **Normalizing Flow** for amplitude distributions
+   - Latent space operations and arithmetic
+
+5. **Quantum Visualization**:
+   - Detailed visualization of wavefunction evolution
+   - Energy components and conservation analysis
+   - Phase space trajectories and uncertainty relations
+
+## Installation
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/yourusername/qbits.git
+   cd qbits
+   ```
+
+2. Create a virtual environment and install dependencies:
+   ```bash
+   python -m venv venv
+   source venv/bin/activate  # On Windows: venv\Scripts\activate
+   pip install -r requirements.txt
+   ```
+
+## Usage
+
+Run the main script to execute the complete workflow:
+
+```bash
+python src/main.py
+```
+
+This will:
+1. Simulate the quantum harmonic oscillator
+2. Train a Hamiltonian Neural Network
+3. Train a Lagrangian Neural Network
+4. Compare energy conservation between HNN and LNN
+5. Train an Observable Predictor
+6. Generate visualizations of the results
+
+## Project Structure
+
+The project is organized into the following directories:
+
+### Source Code
+- `src/core/`: Core quantum simulation modules
+  - `quantum_harmonic_oscillator.py`: Simulates a 1D quantum harmonic oscillator using numerical integration
+  - `measurement_module.py`: Implements measurement operators and observable predictions
+  - `unitary_transforms.py`: Implements unitary transformations for basis changes
+
+- `src/models/`: Neural network models
+  - `hamiltonian_neural_network.py`: Implements a Hamiltonian Neural Network to learn the system dynamics
+  - `lagrangian_neural_network.py`: Implements a Lagrangian Neural Network for improved energy conservation
+  - `quantum_autoencoder.py`: Implements a Variational Autoencoder for quantum states
+  - `normalizing_flow.py`: Implements Normalizing Flows for amplitude distributions
+
+- `src/visualization/`: Visualization tools
+  - `quantum_visualization.py`: Comprehensive visualization tools for quantum dynamics
+  - `fourier_basis_demo.py`: Visualization of quantum states in different bases
+
+- `src/utils/`: Utility modules
+  - `latent_quantum_models.py`: Utilities for working with latent space models
+
+- `src/main.py`: Main script that ties everything together and demonstrates the complete workflow
+
+### Data and Models
+- `data/`: Contains training data and simulation results
+- `models/`: Saved neural network models
+- `images/`: Visualization outputs organized by category
+
+## System Architecture
+
+The implementation follows this architecture:
+
+```
+┌────────────────────┐
+│   Quantum Dataset   │  ← from Qiskit, Rigetti, or real data
+│ (ψ(t), H, observables)│
+└────────┬───────────┘
+         │
+         ▼
+┌─────────────────────────────┐
+│   Physics-Informed Encoder  │  ← LNN/HNN: learns dynamics in latent space
+│   (H(q,p) or L(q,q̇))       │  ← LNN shows superior energy conservation
+└────────┬────────────────────┘
+         │
+         ▼
+ ┌────────────────────────────┐
+ │   Latent Dynamics Module   │ ← ODE or IDE solver in latent space
+ │   (Neural ODE, Diffrax)    │ ← Symplectic integration for LNN
+ └────────┬───────────────────┘
+          │
+          ▼
+  ┌────────────────────────────┐
+  │   Measurement Operator     │ ← Phase space duality via FFT / learned unitary
+  │   (e.g. FFT of latent φ)   │
+  └────────┬───────────────────┘
+           │
+           ▼
+  ┌────────────────────────────┐
+  │   Observable Predictor     │ ← Predict <Z>, <X>, or prob. distribution
+  └────────┬───────────────────┘
+           │
+           ▼
+  ┌────────────────────────────┐
+  │   Quantum Visualization    │ ← Wavefunction evolution, energy components
+  │   Module                   │ ← Phase space trajectories, uncertainty relations
+  └────────────────────────────┘
+```
+
+## Results
+
+### Quantum State Evolution
+![Coherent State Evolution](images/visualizations/coherent_state_evolution.png)
+
+### Neural Network Performance
+![HNN vs LNN Comparison](images/neural_networks/hnn_trajectory_comparison.png)
+
+### Generative Models
+![VAE Latent Space](images/generative_models/vae_latent_space.png)
+
+## Requirements
+
+- Python 3.8+
+- PyTorch 1.9+
+- NumPy
+- SciPy
+- Matplotlib
+
+See `requirements.txt` for the full list of dependencies.
+
+## Citation
+
+If you use this code in your research, please cite:
+
+```
+@software{qbits2025,
+  author = {Your Name},
+  title = {QBits: Quantum Harmonic Oscillator with Physics-Informed Neural Networks},
+  year = {2025},
+  url = {https://github.com/yourusername/qbits}
+}
+```
+
+## Contributing
+
+Contributions are welcome! Please see the [CONTRIBUTING.md](CONTRIBUTING.md) file for guidelines.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
