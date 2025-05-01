@@ -166,11 +166,3 @@ These findings have broader implications for applying machine learning to quantu
 
 The detailed visualizations provide crucial insights into quantum behavior, revealing the perfect energy conservation in the true quantum system. Additionally, our generative models successfully compress quantum state information into meaningful latent representations and generate novel quantum states. This work serves as a stepping stone towards applying these powerful computational tools to address more complex challenges in quantum science.
 </div>
-
-**6. References**
-
-[Placeholder for relevant citations - e.g., papers on HNNs, LNNs, VAEs, Normalizing Flows, Quantum ML]
-
-**7. Code Availability**
-
-The implementation code is available in the accompanying repository [Implicitly, the user's `/home/moises/qbits` directory].
