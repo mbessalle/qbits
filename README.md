@@ -4,6 +4,8 @@
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 [![PyTorch](https://img.shields.io/badge/PyTorch-1.9+-red.svg)](https://pytorch.org/)
 
+![All Models Comparison](images/comparisons/all_models_with_learned.png)
+
 This project implements a 1D quantum harmonic oscillator simulation and trains both Hamiltonian Neural Networks (HNN) and Lagrangian Neural Networks (LNN) to emulate its evolution. It demonstrates how physics-informed neural networks can learn quantum dynamics while preserving important physical constraints like energy conservation.
 
 ![Complete Pipeline Visualization](images/comparisons/complete_pipeline_visualization.png)
