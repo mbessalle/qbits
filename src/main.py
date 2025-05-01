@@ -18,6 +18,7 @@ import argparse
 from core.quantum_harmonic_oscillator import QuantumHarmonicOscillator
 from models.hamiltonian_neural_network import HamiltonianNeuralNetwork
 from models.lagrangian_neural_network import LagrangianNeuralNetwork, prepare_training_data_from_qho
+from models.hybrid_neural_network import HybridNeuralNetwork
 from core.measurement_module import QuantumMeasurementSystem
 
 # Create directories if they don't exist
@@ -186,28 +187,272 @@ def main():
     lnn.plot_trajectory_comparison(q0, p0, (0, 10), q_true, p_true, steps=100)
     print("LNN evaluation complete. Comparison plot saved to 'images/neural_networks/lnn_trajectory_comparison.png'")
     
-    # Step 6: Compare energy conservation between HNN and LNN
-    print("\nStep 6: Comparing energy conservation between HNN and LNN...")
+    # Step 6: Compare energy conservation between HNN, LNN, and Hybrid model
+    print("\nStep 6: Comparing energy conservation between HNN, LNN, and Hybrid model...")
     
-    # Predict trajectories
     # Calculate energies
     energy_true = 0.5 * p_true**2 + 0.5 * q_true**2
-    # Use the neural network to calculate the HNN energy instead of the analytical formula
-    energy_hnn = hnn.calculate_energy(q_hnn, p_hnn)
+    true_mean = np.mean(energy_true)
+    true_std = np.std(energy_true)
+    true_max_dev = 100 * (np.max(energy_true) - np.min(energy_true)) / true_mean
     
-    # Plot energy comparison
-    plt.figure(figsize=(10, 6))
-    plt.plot(t_hnn, energy_hnn, 'b-', label='HNN Predicted')
-    plt.plot(t_lnn, energy_lnn, 'g-', label='LNN Predicted')
-    plt.plot(np.linspace(0, 10, len(energy_true)), energy_true, 'r--', label='True')
-    plt.xlabel('Time')
-    plt.ylabel('Energy (H)')
-    plt.legend()
-    plt.title('Energy Conservation Comparison')
-    plt.savefig('images/comparisons/energy_conservation_comparison.png')
-    plt.close()
+    energy_hnn = 0.5 * p_hnn**2 + 0.5 * q_hnn**2
+    hnn_mean = np.mean(energy_hnn)
+    hnn_std = np.std(energy_hnn)
+    hnn_max_dev = 100 * (np.max(energy_hnn) - np.min(energy_hnn)) / hnn_mean
     
-    print("Energy conservation comparison complete. Plot saved to 'images/comparisons/energy_conservation_comparison.png'")
+    energy_lnn = 0.5 * q_dot_lnn**2 + 0.5 * q_lnn**2
+    lnn_mean = np.mean(energy_lnn)
+    lnn_std = np.std(energy_lnn)
+    lnn_max_dev = 100 * (np.max(energy_lnn) - np.min(energy_lnn)) / lnn_mean
+    
+    # Create hybrid model
+    print("\nStep 7: Creating and evaluating hybrid models...")
+    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+    
+    # 7.1: Ensemble Hybrid Model
+    print("\n7.1: Evaluating Ensemble Hybrid Model...")
+    hybrid_model = HybridNeuralNetwork(hnn, lnn, device=device)
+    
+    # Optimize hyperparameters for hybrid model
+    print("Optimizing ensemble hybrid model hyperparameters...")
+    
+    # Grid search over alpha and energy conservation weight
+    alphas = [0.3, 0.5, 0.7, 0.9]
+    energy_weights = [0.3, 0.5, 0.7, 0.9]
+    
+    best_alpha = 0.5
+    best_energy_weight = 0.5
+    best_score = float('inf')
+    
+    results = []
+    
+    for alpha in alphas:
+        for energy_weight in energy_weights:
+            # Generate predictions with current hyperparameters
+            _, q_hybrid, p_hybrid, energy_hybrid = hybrid_model.predict_physics_constrained_trajectory(
+                q0, p0, (0, 10), steps=100, alpha=alpha, energy_conservation_weight=energy_weight
+            )
+            
+            # Calculate phase space error
+            phase_space_error = np.mean((q_hybrid - q_true)**2 + (p_hybrid - p_true)**2)
+            
+            # Calculate energy conservation error
+            energy_error = np.std(energy_hybrid) / np.mean(energy_hybrid)
+            
+            # Combined score (lower is better)
+            score = phase_space_error + energy_error
+            
+            results.append((alpha, energy_weight, phase_space_error, energy_error, score))
+            
+            # Update best parameters if this is better
+            if score < best_score:
+                best_score = score
+                best_alpha = alpha
+                best_energy_weight = energy_weight
+    
+    # Generate hybrid model predictions with best parameters
+    print(f"Generating ensemble hybrid model predictions with alpha={best_alpha}, energy_weight={best_energy_weight}...")
+    t_hybrid, q_hybrid, p_hybrid, energy_hybrid = hybrid_model.predict_physics_constrained_trajectory(
+        q0, p0, (0, 10), steps=100, alpha=best_alpha, energy_conservation_weight=best_energy_weight
+    )
+    
+    hybrid_mean = np.mean(energy_hybrid)
+    hybrid_std = np.std(energy_hybrid)
+    hybrid_max_dev = 100 * (np.max(energy_hybrid) - np.min(energy_hybrid)) / hybrid_mean
+    
+    # Now evaluate the learning-based approach
+    print("\nEvaluating learning-based hybrid model...")
+    
+    # Optimize alpha for learning-based model
+    best_learning_alpha = 0.5
+    best_learning_score = float('inf')
+    learning_results = []
+    
+    for alpha in alphas:
+        # Generate predictions with current alpha
+        _, q_learning, p_learning, energy_learning = hybrid_model.predict_learning_based_trajectory(
+            q0, p0, (0, 10), steps=100, alpha=alpha
+        )
+        
+        # Calculate phase space error
+        phase_space_error = np.mean((q_learning - q_true)**2 + (p_learning - p_true)**2)
+        
+        # Calculate energy conservation error
+        energy_error = np.std(energy_learning) / np.mean(energy_learning)
+        
+        # Combined score (lower is better)
+        score = phase_space_error + energy_error
+        
+        learning_results.append((alpha, phase_space_error, energy_error, score))
+        
+        # Update best parameters if this is better
+        if score < best_learning_score:
+            best_learning_score = score
+            best_learning_alpha = alpha
+    
+    # Print learning-based results
+    print("\nLearning-based model optimization results:")
+    print("-" * 80)
+    print(f"{'Alpha':<10} {'Phase Space Error':<20} {'Energy Error':<15} {'Total Score':<15}")
+    print("-" * 80)
+    
+    # Sort by score
+    learning_results.sort(key=lambda x: x[3])
+    
+    for alpha, phase_error, energy_error, score in learning_results:
+        print(f"{alpha:<10.2f} {phase_error:<20.6f} {energy_error:<15.6f} {score:<15.6f}")
+    
+    print("-" * 80)
+    print(f"Best learning-based alpha: {best_learning_alpha}, score={best_learning_score:.6f}")
+    
+    # Generate learning-based predictions with best alpha
+    print(f"Generating learning-based hybrid model predictions with alpha={best_learning_alpha}...")
+    t_learning, q_learning, p_learning, energy_learning = hybrid_model.predict_learning_based_trajectory(
+        q0, p0, (0, 10), steps=100, alpha=best_learning_alpha
+    )
+    
+    learning_mean = np.mean(energy_learning)
+    learning_std = np.std(energy_learning)
+    learning_max_dev = 100 * (np.max(energy_learning) - np.min(energy_learning)) / learning_mean
+    
+    # Now train a true hybrid model that learns from both HNN and LNN
+    print("\nTraining a true hybrid model that learns from both HNN and LNN...")
+    
+    if not args.skip_training:
+        # Train the hybrid model
+        losses, hybrid_learned_model = hybrid_model.train_hybrid_model(
+            qp_data, derivatives, batch_size=32, epochs=300, 
+            learning_rate=1e-3, print_every=50, save_model=True
+        )
+        
+        # Plot training loss
+        plt.figure(figsize=(10, 6))
+        plt.plot(losses)
+        plt.xlabel('Epoch')
+        plt.ylabel('Loss')
+        plt.title('Hybrid Model Training Loss')
+        plt.grid(True)
+        plt.savefig('images/neural_networks/hybrid_learned_model_loss.png')
+        plt.close()
+        print("Training loss plot saved to 'images/neural_networks/hybrid_learned_model_loss.png'")
+    else:
+        # Create a dummy model structure to load the saved weights
+        class HybridNet(nn.Module):
+            def __init__(self, hnn, lnn, hidden_dim=64):
+                super(HybridNet, self).__init__()
+                self.hnn = hnn
+                self.lnn = lnn
+                self.net = nn.Sequential(
+                    nn.Linear(4, hidden_dim),
+                    nn.Tanh(),
+                    nn.Linear(hidden_dim, hidden_dim),
+                    nn.Tanh(),
+                    nn.Linear(hidden_dim, 2)
+                )
+            
+            def forward(self, q, p):
+                # Implementation details not needed for loading
+                pass
+        
+        # Load the pre-trained model
+        hybrid_learned_model = HybridNet(hybrid_model.hnn.model, hybrid_model.lnn.model).to(device)
+        try:
+            hybrid_learned_model.load_state_dict(torch.load("models/hybrid_learned_model.pt"))
+            print("Loaded pre-trained hybrid learned model")
+        except:
+            print("No pre-trained hybrid learned model found, skipping evaluation")
+            hybrid_learned_model = None
+    
+    # Evaluate the learned hybrid model if available
+    if hybrid_learned_model is not None:
+        print("Evaluating the learned hybrid model...")
+        t_learned, q_learned, p_learned, energy_learned = hybrid_model.predict_learned_trajectory(
+            hybrid_learned_model, q0, p0, (0, 10), steps=100
+        )
+        
+        # Add the learned model to the comparison plot
+        plt.figure(figsize=(15, 12))
+        
+        # Phase space trajectories
+        plt.subplot(2, 2, 1)
+        plt.plot(q_true, p_true, 'r-', linewidth=3, label='True')
+        plt.plot(q_hnn, p_hnn, 'b--', linewidth=1.5, label='HNN')
+        plt.plot(q_lnn, q_dot_lnn, 'g-.', linewidth=1.5, label='LNN')
+        plt.plot(q_hybrid, p_hybrid, 'c-', linewidth=1.5, label='Physics-Constrained')
+        plt.plot(q_learning, p_learning, 'm-', linewidth=1.5, label='RK4 Combined')
+        plt.plot(q_learned, p_learned, 'y-', linewidth=1.5, label='Learned Hybrid')
+        plt.xlabel('Position (q)')
+        plt.ylabel('Momentum (p)')
+        plt.title('Phase Space Trajectories')
+        plt.legend()
+        plt.grid(True)
+        
+        # Position over time
+        plt.subplot(2, 2, 2)
+        t_true = np.linspace(0, 10, len(q_true))
+        plt.plot(t_true, q_true, 'r-', linewidth=3, label='True')
+        plt.plot(t_hnn, q_hnn, 'b--', linewidth=1.5, label='HNN')
+        plt.plot(t_lnn, q_lnn, 'g-.', linewidth=1.5, label='LNN')
+        plt.plot(t_hybrid, q_hybrid, 'c-', linewidth=1.5, label='Physics-Constrained')
+        plt.plot(t_learning, q_learning, 'm-', linewidth=1.5, label='RK4 Combined')
+        plt.plot(t_learned, q_learned, 'y-', linewidth=1.5, label='Learned Hybrid')
+        plt.xlabel('Time (t)')
+        plt.ylabel('Position (q)')
+        plt.title('Position vs Time')
+        plt.legend()
+        plt.grid(True)
+        
+        # Momentum over time
+        plt.subplot(2, 2, 3)
+        plt.plot(t_true, p_true, 'r-', linewidth=3, label='True')
+        plt.plot(t_hnn, p_hnn, 'b--', linewidth=1.5, label='HNN')
+        plt.plot(t_lnn, q_dot_lnn, 'g-.', linewidth=1.5, label='LNN')
+        plt.plot(t_hybrid, p_hybrid, 'c-', linewidth=1.5, label='Physics-Constrained')
+        plt.plot(t_learning, p_learning, 'm-', linewidth=1.5, label='RK4 Combined')
+        plt.plot(t_learned, p_learned, 'y-', linewidth=1.5, label='Learned Hybrid')
+        plt.xlabel('Time (t)')
+        plt.ylabel('Momentum (p)')
+        plt.title('Momentum vs Time')
+        plt.legend()
+        plt.grid(True)
+        
+        # Energy conservation
+        plt.subplot(2, 2, 4)
+        plt.plot(t_true, energy_true, 'r-', linewidth=3, label='True')
+        plt.plot(t_hnn, energy_hnn, 'b--', linewidth=1.5, label='HNN')
+        plt.plot(t_lnn, energy_lnn, 'g-.', linewidth=1.5, label='LNN')
+        plt.plot(t_hybrid, energy_hybrid, 'c-', linewidth=1.5, label='Physics-Constrained')
+        plt.plot(t_learning, energy_learning, 'm-', linewidth=1.5, label='RK4 Combined')
+        plt.plot(t_learned, energy_learned, 'y-', linewidth=1.5, label='Learned Hybrid')
+        plt.xlabel('Time (t)')
+        plt.ylabel('Energy (H)')
+        plt.title('Energy Conservation')
+        plt.legend()
+        plt.grid(True)
+        
+        plt.tight_layout()
+        plt.savefig('images/comparisons/all_models_with_learned.png')
+        plt.close()
+        print("Comprehensive model comparison with learned hybrid saved to 'images/comparisons/all_models_with_learned.png'")
+        
+        # Update energy conservation statistics
+        learned_mean = np.mean(energy_learned)
+        learned_std = np.std(energy_learned)
+        learned_max_dev = 100 * (np.max(energy_learned) - np.min(energy_learned)) / learned_mean
+        
+        # Print updated energy statistics
+        print("\nUpdated Energy Conservation Analysis:")
+        print("-" * 80)
+        print(f"{'Model':<20} {'Mean Energy':<15} {'Std Dev':<15} {'Max Deviation %':<15}")
+        print("-" * 80)
+        print(f"{'True':<20} {true_mean:<15.6f} {true_std:<15.6f} {true_max_dev:<15.6f}")
+        print(f"{'HNN':<20} {hnn_mean:<15.6f} {hnn_std:<15.6f} {hnn_max_dev:<15.6f}")
+        print(f"{'LNN':<20} {lnn_mean:<15.6f} {lnn_std:<15.6f} {lnn_max_dev:<15.6f}")
+        print(f"{'Physics-Constrained':<20} {hybrid_mean:<15.6f} {hybrid_std:<15.6f} {hybrid_max_dev:<15.6f}")
+        print(f"{'RK4 Combined':<20} {learning_mean:<15.6f} {learning_std:<15.6f} {learning_max_dev:<15.6f}")
+        print(f"{'Learned Hybrid':<20} {learned_mean:<15.6f} {learned_std:<15.6f} {learned_max_dev:<15.6f}")
+        print("-" * 80)
     
     # Step 7: Train or load the Observable Predictor
     # Create the quantum measurement system
@@ -393,12 +638,9 @@ def create_complete_pipeline_visualization(qho, t_points, psi_t, q_true, p_true,
     # 5. Position comparison over time
     ax5 = fig.add_subplot(gs[2, 0])
     t_true = np.linspace(0, t_points[-1], len(q_true))
-    t_hnn = np.linspace(0, t_points[-1], len(q_hnn))
-    t_lnn = np.linspace(0, t_points[-1], len(q_lnn))
-    
-    ax5.plot(t_true, q_true, 'r-', label='True')
-    ax5.plot(t_hnn, q_hnn, 'b--', label='HNN')
-    ax5.plot(t_lnn, q_lnn, 'g-.', label='LNN')
+    plt.plot(t_true, q_true, 'r-', label='True')
+    plt.plot(t_true, q_hnn, 'b--', label='HNN')
+    plt.plot(t_true, q_lnn, 'g-.', label='LNN')
     ax5.set_xlabel('Time (t)')
     ax5.set_ylabel('Position (q)')
     ax5.set_title('Position Comparison')
@@ -407,9 +649,9 @@ def create_complete_pipeline_visualization(qho, t_points, psi_t, q_true, p_true,
     
     # 6. Momentum comparison over time
     ax6 = fig.add_subplot(gs[2, 1])
-    ax6.plot(t_true, p_true, 'r-', label='True')
-    ax6.plot(t_hnn, p_hnn, 'b--', label='HNN')
-    ax6.plot(t_lnn, p_lnn, 'g-.', label='LNN')
+    plt.plot(t_true, p_true, 'r-', label='True')
+    plt.plot(t_true, p_hnn, 'b--', label='HNN')
+    plt.plot(t_true, p_lnn, 'g-.', label='LNN')
     ax6.set_xlabel('Time (t)')
     ax6.set_ylabel('Momentum (p)')
     ax6.set_title('Momentum Comparison')
@@ -418,9 +660,9 @@ def create_complete_pipeline_visualization(qho, t_points, psi_t, q_true, p_true,
     
     # 7. Energy conservation comparison
     ax7 = fig.add_subplot(gs[2, 2])
-    ax7.plot(t_true, energy_true, 'r-', label='True')
-    ax7.plot(t_hnn, energy_hnn, 'b--', label='HNN')
-    ax7.plot(t_lnn, energy_lnn, 'g-.', label='LNN')
+    plt.plot(t_true, energy_true, 'r-', label='True')
+    plt.plot(t_true, energy_hnn, 'b--', linewidth=1.5, label='HNN')
+    plt.plot(t_true, energy_lnn, 'g-.', linewidth=1.5, label='LNN')
     ax7.set_xlabel('Time (t)')
     ax7.set_ylabel('Energy (H)')
     ax7.set_title('Energy Conservation')

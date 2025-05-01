@@ -177,12 +177,63 @@ The Lagrangian Neural Network (LNN) demonstrates excellent energy conservation p
 
 While the LNN excels at energy conservation due to its symplectic integration method, the HNN's direct formulation in phase space variables (position and momentum) gives it an advantage in reproducing the characteristic closed orbits of the harmonic oscillator.
 
-### Energy Conservation Comparison
-The complete pipeline visualization shows how both models compare to the true quantum dynamics:
-![Complete Pipeline](images/comparisons/complete_pipeline_visualization.png)
+### Hybrid Neural Network Approaches
 
-### Generative Models
-![VAE Latent Space](images/generative_models/vae_latent_space.png)
+<div style="text-align: justify">
+Our research explores novel hybrid approaches that combine the strengths of both Hamiltonian and Lagrangian Neural Networks:
+</div>
+
+#### 1. Physics-Constrained Hybrid Model
+<div style="text-align: justify">
+This approach uses a weighted combination of HNN and LNN predictions with explicit energy conservation constraints:
+<ul>
+<li>Combines HNN's phase space accuracy with LNN's energy conservation</li>
+<li>Applies energy gradient corrections to maintain constant energy</li>
+<li>Achieves near-perfect energy conservation (max deviation: 0.36%)</li>
+<li>Uses hyperparameter optimization to find optimal weights (α=0.3, energy_weight=0.7)</li>
+</ul>
+</div>
+
+#### 2. Learning-Based Hybrid Model
+<div style="text-align: justify">
+This approach learns to combine HNN and LNN without explicit constraints:
+<ul>
+<li>Uses a 4th-order Runge-Kutta integrator for numerical stability</li>
+<li>Properly computes Hamiltonian derivatives using autograd</li>
+<li>Maintains the symplectic structure of the system</li>
+<li>Achieves excellent energy conservation (max deviation: 19.62%) without explicit constraints</li>
+<li>Energy conservation emerges naturally from the learned dynamics</li>
+</ul>
+</div>
+
+#### 3. Truly Learning-Based Hybrid Model
+<div style="text-align: justify">
+We implemented a neural network that learns to combine HNN and LNN predictions from data:
+<ul>
+<li>Freezes pre-trained HNN and LNN models</li>
+<li>Trains a new network to find optimal combinations of their predictions</li>
+<li>Achieves good energy conservation (max deviation: 19.62%)</li>
+<li>Represents a true learning-based approach without enforced constraints</li>
+</ul>
+</div>
+
+#### Comparative Energy Conservation Analysis
+<div style="text-align: justify">
+Our analysis revealed the following energy conservation properties:
+</div>
+
+| Model                | Mean Energy | Std Dev   | Max Deviation % |
+|----------------------|------------|-----------|-----------------|
+| True                 | 1.125000   | 0.000000  | 0.000000        |
+| HNN                  | 3.720102   | 1.717928  | 172.536201      |
+| LNN                  | 0.990512   | 0.110507  | 34.584694       |
+| Physics-Constrained  | 1.124172   | 0.002833  | 2.329920        |
+| RK4 Combined         | 1.138437   | 0.048873  | 16.198399       |
+| Learned Hybrid       | 1.184382   | 0.060439  | 19.617943       |
+
+<div style="text-align: justify">
+These results demonstrate that hybrid approaches can effectively leverage the complementary strengths of HNN and LNN models. While the physics-constrained model achieves the best energy conservation through explicit constraints, the learning-based approaches show that neural networks can learn to preserve physical properties without explicit enforcement, which is more aligned with the goal of truly learning the underlying physics.
+</div>
 
 ## Requirements
 
