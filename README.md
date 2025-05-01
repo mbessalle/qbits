@@ -200,10 +200,10 @@ If you use this code in your research, please cite:
 
 ```
 @software{qbits2025,
-  author = {Your Name},
+  author = {Moises Bessalle},
   title = {QBits: Quantum Harmonic Oscillator with Physics-Informed Neural Networks},
   year = {2025},
-  url = {https://github.com/yourusername/qbits}
+  url = {https://github.com/mbessalle/qbits}
 }
 ```
 
