@@ -132,11 +132,3 @@ We have presented a comprehensive framework demonstrating the application of Ham
 Our results highlight the potential of deep learning to learn quantum dynamics, with some unexpected findings. While the Lagrangian Neural Network shows particular promise for preserving energy conservation due to its symplectic integration method, we observed that the Hamiltonian Neural Network produces more accurate phase space trajectories. This suggests that the Hamiltonian formulation, which directly operates in phase space coordinates, is particularly well-suited for quantum systems where accurate representation of position-momentum relationships is critical. The complementary strengths of these two approaches—energy conservation in LNNs and phase space accuracy in HNNs—indicate that hybrid models combining both formulations could be especially powerful for quantum applications.
 
 The detailed visualizations provide crucial insights into quantum behavior, revealing the perfect energy conservation in the true quantum system. Additionally, our generative models successfully compress quantum state information into meaningful latent representations and generate novel quantum states. This work serves as a stepping stone towards applying these powerful computational tools to address more complex challenges in quantum science.
-
-**6. References**
-
-[Placeholder for relevant citations - e.g., papers on HNNs, LNNs, VAEs, Normalizing Flows, Quantum ML]
-
-**7. Code Availability**
-
-The implementation code is available in the accompanying repository [Implicitly, the user's `/home/moises/qbits` directory].
