@@ -237,6 +237,13 @@ Our analysis revealed the following energy conservation properties:
 These results demonstrate that hybrid approaches can effectively leverage the complementary strengths of HNN and LNN models. While the physics-constrained model achieves the best energy conservation through explicit constraints, the learning-based approaches show that neural networks can learn to preserve physical properties without explicit enforcement, which is more aligned with the goal of truly learning the underlying physics.
 </div>
 
+### Energy Conservation Comparison
+<div style="text-align: justify">
+The energy conservation comparison below shows how all models perform in maintaining the system's energy over time. While the HNN shows significant energy drift, the LNN, RK4 Combined, and Learned Hybrid models all maintain energy much closer to the true value, demonstrating the effectiveness of our hybrid approaches:
+</div>
+
+![Energy Conservation Comparison](images/comparisons/all_models_with_learned.png)
+
 ## Requirements
 
 - Python 3.8+
