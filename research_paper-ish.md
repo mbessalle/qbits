@@ -25,31 +25,30 @@ By integrating these methods, we aim to provide a versatile toolkit for explorin
 Our framework is built upon several key components:
 
 **2.1 Quantum Harmonic Oscillator (QHO) Simulation:**
-We implement a 1D QHO simulation using standard numerical methods. The time evolution of the wavefunction \( \psi(x, t) \) is governed by the time-dependent Schrödinger equation. We utilize the `scipy.integrate.solve_ivp` function to numerically integrate the equations of motion, discretizing the spatial dimension `x`. This component generates the ground truth data (wavefunctions, trajectories) used for training the ML models. Our implementation includes the ability to create various initial states, including coherent states with non-zero momentum, which are essential for testing the neural network models.
+We implement a 1D QHO simulation using standard numerical methods. The time evolution of the wavefunction $\psi(x, t)$ is governed by the time-dependent Schrödinger equation. We utilize the `scipy.integrate.solve_ivp` function to numerically integrate the equations of motion, discretizing the spatial dimension `x`. This component generates the ground truth data (wavefunctions, trajectories) used for training the ML models. Our implementation includes the ability to create various initial states, including coherent states with non-zero momentum, which are essential for testing the neural network models.
 
 **2.2 Physics-Informed Neural Networks:**
 
 **2.2.1 Hamiltonian Neural Networks (HNNs):**
-Inspired by the structure of Hamiltonian mechanics, HNNs learn a scalar energy function (the Hamiltonian) H(q,p) from phase space trajectories (q(t), p(t)). The dynamics are then derived using Hamilton's equations:
+Inspired by the structure of Hamiltonian mechanics, HNNs learn a scalar energy function (the Hamiltonian) $H(q,p)$ from phase space trajectories $(q(t), p(t))$. The dynamics are then derived using Hamilton's equations:
 
-dq/dt = ∂H/∂p (How positions change depends on the gradient of H w.r.t. momenta)
+$dq/dt = \partial H/\partial p$ (How positions change depends on the gradient of H w.r.t. momenta)
 
-dp/dt = −∂H/∂q (How momenta change depends on the negative gradient of H w.r.t. positions)
-​
+$dp/dt = -\partial H/\partial q$ (How momenta change depends on the negative gradient of H w.r.t. positions)
 
 and uses automatic differentiation to compute the dynamics. While HNNs provide a physics-informed approach to learning dynamics, our experiments reveal limitations in their ability to conserve energy over long trajectories.
 
 **2.2.2 Lagrangian Neural Networks (LNNs):**
-To address the energy conservation limitations of HNNs, we implement Lagrangian Neural Networks that learn the Lagrangian \( L(q, \dot{q}) \) instead of the Hamiltonian. The dynamics are derived using the Euler-Lagrange equations: \( \frac{d}{dt}(\frac{\partial L}{\partial \dot{q}}) - \frac{\partial L}{\partial q} = 0 \). Our LNN implementation incorporates physics-informed components (the analytical form of the harmonic oscillator Lagrangian) and uses symplectic integration methods to ensure better energy conservation. Comparative analysis shows that LNNs significantly outperform HNNs in preserving energy over long trajectories.
+To address the energy conservation limitations of HNNs, we implement Lagrangian Neural Networks that learn the Lagrangian $L(q, \dot{q})$ instead of the Hamiltonian. The dynamics are derived using the Euler-Lagrange equations: $\frac{d}{dt}\left(\frac{\partial L}{\partial \dot{q}}\right) - \frac{\partial L}{\partial q} = 0$. Our LNN implementation incorporates physics-informed components (the analytical form of the harmonic oscillator Lagrangian) and uses symplectic integration methods to ensure better energy conservation. Comparative analysis shows that LNNs significantly outperform HNNs in preserving energy over long trajectories.
 
 **2.3 Quantum Dynamics Visualization:**
 We develop comprehensive visualization tools to analyze the quantum dynamics of the harmonic oscillator:
 
-*   **Wavefunction Evolution:** Visualizing the probability density \(|\psi(x, t)|^2\) over time as a heatmap.
-*   **Expectation Value Trajectories:** Plotting the time evolution of position \(\langle x \rangle\), momentum \(\langle p \rangle\), and energy \(\langle H \rangle\) expectation values.
+*   **Wavefunction Evolution:** Visualizing the probability density $|\psi(x, t)|^2$ over time as a heatmap.
+*   **Expectation Value Trajectories:** Plotting the time evolution of position $\langle x \rangle$, momentum $\langle p \rangle$, and energy $\langle H \rangle$ expectation values.
 *   **Phase Space Representation:** Showing the trajectory in phase space and the corresponding Wigner function at different time points.
 *   **Energy Components:** Analyzing the kinetic and potential energy contributions and their exchange over time, demonstrating perfect energy conservation in the quantum system.
-*   **Uncertainty Relations:** Tracking the position-momentum uncertainty product \(\Delta x \cdot \Delta p\) to verify compliance with the Heisenberg uncertainty principle.
+*   **Uncertainty Relations:** Tracking the position-momentum uncertainty product $\Delta x \cdot \Delta p$ to verify compliance with the Heisenberg uncertainty principle.
 
 These visualizations provide crucial insights into the quantum behavior and serve as ground truth for evaluating our neural network models.
 
@@ -70,10 +69,10 @@ These innovations allow our framework to maintain physical consistency while lev
 
 **2.5 Variational Autoencoders (VAEs) for Quantum States:**
 VAEs are generative models that learn a probabilistic mapping from input data to a lower-dimensional latent space and back. Our `QuantumVariationalAutoencoder` takes QHO wavefunctions (represented as concatenated real and imaginary parts) as input. It consists of:
-*   An **encoder** network that maps the input wavefunction \( \psi \) to the parameters (mean \( \mu \) and log-variance \( \log \sigma^2 \)) of a Gaussian distribution in the latent space \( z \).
-*   A **sampling** step using the reparameterization trick: \( z = \mu + \sigma \odot \epsilon \), where \( \epsilon \) is random noise.
-*   A **decoder** network that maps the latent vector \( z \) back to a reconstructed wavefunction \( \psi' \).
-The model is trained by minimizing a loss function comprising a reconstruction term (e.g., MSE between \( \psi \) and \( \psi' \)) and a KL divergence term that regularizes the latent space distribution towards a standard normal distribution.
+*   An **encoder** network that maps the input wavefunction $\psi$ to the parameters (mean $\mu$ and log-variance $\log \sigma^2$) of a Gaussian distribution in the latent space $z$.
+*   A **sampling** step using the reparameterization trick: $z = \mu + \sigma \odot \epsilon$, where $\epsilon$ is random noise.
+*   A **decoder** network that maps the latent vector $z$ back to a reconstructed wavefunction $\psi'$.
+The model is trained by minimizing a loss function comprising a reconstruction term (e.g., MSE between $\psi$ and $\psi'$) and a KL divergence term that regularizes the latent space distribution towards a standard normal distribution.
 
 **2.6 Normalizing Flows for Amplitude Distributions:**
 Normalizing Flows transform a simple base probability distribution (e.g., Gaussian) into a complex target distribution through a sequence of invertible transformations with tractable Jacobians. Our `AmplitudeFlow` model uses this principle:
@@ -95,7 +94,7 @@ We trained and evaluated the different components of our framework using data ge
 *   **LNN Training:** The Lagrangian Neural Network demonstrated superior performance in energy conservation compared to the HNN. By learning the Lagrangian structure and using symplectic integration, the LNN maintained nearly constant energy levels throughout the predicted trajectories, closely matching the true quantum system's behavior. Comparative visualization (`energy_conservation_comparison.png`) clearly shows the LNN's advantage in preserving this fundamental physical constraint.
 *   **Hybrid Neural Network Approaches:** Building on the complementary strengths of HNNs and LNNs, we developed and evaluated several hybrid approaches:
 
-    * **Physics-Constrained Hybrid Model:** <div style="text-align: justify">This model combines HNN and LNN predictions with explicit energy conservation constraints. It uses a weighted combination of derivatives from both models (with optimal weights α=0.3, energy_weight=0.7 determined through hyperparameter optimization) and applies energy gradient corrections to maintain constant energy. This approach achieved near-perfect energy conservation with a maximum deviation of only 0.36% from the mean energy, significantly outperforming both individual models.</div>
+    * **Physics-Constrained Hybrid Model:** <div style="text-align: justify">This model combines HNN and LNN predictions with explicit energy conservation constraints. It uses a weighted combination of derivatives from both models (with optimal weights $\alpha=0.3$, energy_weight=0.7 determined through hyperparameter optimization) and applies energy gradient corrections to maintain constant energy. This approach achieved near-perfect energy conservation with a maximum deviation of only 0.36% from the mean energy, significantly outperforming both individual models.</div>
     
     * **Learning-Based Hybrid Model with RK4 Integration:** <div style="text-align: justify">This approach combines HNN and LNN predictions without explicit energy constraints, instead relying on a 4th-order Runge-Kutta integrator for numerical stability. By properly computing Hamiltonian derivatives using autograd and maintaining the symplectic structure of the system, this model achieved excellent energy conservation (max deviation: 16.20%) without explicit constraints. This demonstrates that energy conservation can emerge naturally from the learned dynamics when using appropriate integration techniques.</div>
     
@@ -126,7 +125,7 @@ We trained and evaluated the different components of our framework using data ge
 *   **VAE Performance:** The `QuantumVariationalAutoencoder` achieved significant compression (128D state to 8D latent space) while maintaining good reconstruction quality (see `vae_reconstruction.png`). The learned latent space showed structure (see `vae_latent_space.png`), and the model could generate plausible new quantum states (see `vae_generated_states.png`).
 *   **Normalizing Flow Performance:** The `AmplitudeFlow` model also learned to represent the quantum states. It demonstrated the ability to generate samples from the learned posterior distribution (see `amplitude_flow_samples.png`) and the prior (see `amplitude_flow_prior_samples.png`). Interpolation in the latent space produced smooth transitions between quantum states (see `amplitude_flow_interpolation.png`).
 *   **Model Comparison:** The `latent_quantum_models.py` script provided direct comparisons. Both VAE and Flow models achieved reasonable reconstructions and generated valid states. Visualizations highlighted differences in their latent space structures and generative capabilities (see `model_comparison_*.png`, `latent_space_comparison.png`).
-*   **Latent Space Operations:** We successfully demonstrated arithmetic (e.g., \( \psi_1 - \psi_2 + \psi_3 \)) and weighted superposition operations performed directly in the latent spaces of both VAE and Flow models, generating novel quantum states with interpretable properties (see `latent_space_arithmetic.png`, `quantum_superpositions.png`).
+*   **Latent Space Operations:** We successfully demonstrated arithmetic (e.g., $\psi_1 - \psi_2 + \psi_3$) and weighted superposition operations performed directly in the latent spaces of both VAE and Flow models, generating novel quantum states with interpretable properties (see `latent_space_arithmetic.png`, `quantum_superpositions.png`).
 
 **3.4 Unitary HNN vs Standard HNN Comparison**
 
