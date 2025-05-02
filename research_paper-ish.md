@@ -30,7 +30,14 @@ We implement a 1D QHO simulation using standard numerical methods. The time evol
 **2.2 Physics-Informed Neural Networks:**
 
 **2.2.1 Hamiltonian Neural Networks (HNNs):**
-Inspired by the structure of Hamiltonian mechanics, HNNs learn a scalar energy function (the Hamiltonian) \( H(q, p) \) from phase space trajectories \( (q(t), p(t)) \). The dynamics are then derived using Hamilton's equations: \( \dot{q} = \partial H / \partial p \) and \( \dot{p} = -\partial H / \partial q \). Our implementation trains a standard feed-forward neural network to approximate \( H \) and uses automatic differentiation to compute the dynamics. While HNNs provide a physics-informed approach to learning dynamics, our experiments reveal limitations in their ability to conserve energy over long trajectories.
+Inspired by the structure of Hamiltonian mechanics, HNNs learn a scalar energy function (the Hamiltonian) H(q,p) from phase space trajectories (q(t), p(t)). The dynamics are then derived using Hamilton's equations:
+
+dq/dt = ∂H/∂p (How positions change depends on the gradient of H w.r.t. momenta)
+
+dp/dt = −∂H/∂q (How momenta change depends on the negative gradient of H w.r.t. positions)
+​
+
+and uses automatic differentiation to compute the dynamics. While HNNs provide a physics-informed approach to learning dynamics, our experiments reveal limitations in their ability to conserve energy over long trajectories.
 
 **2.2.2 Lagrangian Neural Networks (LNNs):**
 To address the energy conservation limitations of HNNs, we implement Lagrangian Neural Networks that learn the Lagrangian \( L(q, \dot{q}) \) instead of the Hamiltonian. The dynamics are derived using the Euler-Lagrange equations: \( \frac{d}{dt}(\frac{\partial L}{\partial \dot{q}}) - \frac{\partial L}{\partial q} = 0 \). Our LNN implementation incorporates physics-informed components (the analytical form of the harmonic oscillator Lagrangian) and uses symplectic integration methods to ensure better energy conservation. Comparative analysis shows that LNNs significantly outperform HNNs in preserving energy over long trajectories.
@@ -233,11 +240,3 @@ These findings have broader implications for applying machine learning to quantu
 
 The detailed visualizations provide crucial insights into quantum behavior, revealing the perfect energy conservation in the true quantum system. Additionally, our generative models successfully compress quantum state information into meaningful latent representations and generate novel quantum states. This work serves as a stepping stone towards applying these powerful computational tools to address more complex challenges in quantum science.
 </div>
-
-**6. References**
-
-[Placeholder for relevant citations - e.g., papers on HNNs, LNNs, VAEs, Normalizing Flows, Quantum ML]
-
-**7. Code Availability**
-
-The implementation code is available in the accompanying repository [Implicitly, the user's `/home/moises/qbits` directory].
