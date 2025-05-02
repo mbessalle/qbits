@@ -30,7 +30,13 @@ We implement a 1D QHO simulation using standard numerical methods. The time evol
 **2.2 Physics-Informed Neural Networks:**
 
 **2.2.1 Hamiltonian Neural Networks (HNNs):**
-Inspired by the structure of Hamiltonian mechanics, HNNs learn a scalar energy function (the Hamiltonian) \( H(q, p) \) from phase space trajectories \( (q(t), p(t)) \). The dynamics are then derived using Hamilton's equations: \( \dot{q} = \partial H / \partial p \) and \( \dot{p} = -\partial H / \partial q \). Our implementation trains a standard feed-forward neural network to approximate \( H \) and uses automatic differentiation to compute the dynamics. While HNNs provide a physics-informed approach to learning dynamics, our experiments reveal limitations in their ability to conserve energy over long trajectories.
+Inspired by the structure of Hamiltonian mechanics, HNNs learn a scalar energy function (the Hamiltonian) H(q,p) from phase space trajectories (q(t), p(t)). The dynamics are then derived using Hamilton's equations:
+
+dq/dt = ∂H/∂p (How positions change depends on the gradient of H w.r.t. momenta)
+
+dp/dt = −∂H/∂q (How momenta change depends on the negative gradient of H w.r.t. positions)
+​
+and uses automatic differentiation to compute the dynamics. While HNNs provide a physics-informed approach to learning dynamics, our experiments reveal limitations in their ability to conserve energy over long trajectories.
 
 **2.2.2 Lagrangian Neural Networks (LNNs):**
 To address the energy conservation limitations of HNNs, we implement Lagrangian Neural Networks that learn the Lagrangian \( L(q, \dot{q}) \) instead of the Hamiltonian. The dynamics are derived using the Euler-Lagrange equations: \( \frac{d}{dt}(\frac{\partial L}{\partial \dot{q}}) - \frac{\partial L}{\partial q} = 0 \). Our LNN implementation incorporates physics-informed components (the analytical form of the harmonic oscillator Lagrangian) and uses symplectic integration methods to ensure better energy conservation. Comparative analysis shows that LNNs significantly outperform HNNs in preserving energy over long trajectories.
