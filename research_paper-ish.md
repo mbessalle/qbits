@@ -36,6 +36,7 @@ dq/dt = ∂H/∂p (How positions change depends on the gradient of H w.r.t. mome
 
 dp/dt = −∂H/∂q (How momenta change depends on the negative gradient of H w.r.t. positions)
 ​
+
 and uses automatic differentiation to compute the dynamics. While HNNs provide a physics-informed approach to learning dynamics, our experiments reveal limitations in their ability to conserve energy over long trajectories.
 
 **2.2.2 Lagrangian Neural Networks (LNNs):**
