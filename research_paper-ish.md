@@ -121,6 +121,73 @@ We trained and evaluated the different components of our framework using data ge
 *   **Model Comparison:** The `latent_quantum_models.py` script provided direct comparisons. Both VAE and Flow models achieved reasonable reconstructions and generated valid states. Visualizations highlighted differences in their latent space structures and generative capabilities (see `model_comparison_*.png`, `latent_space_comparison.png`).
 *   **Latent Space Operations:** We successfully demonstrated arithmetic (e.g., \( \psi_1 - \psi_2 + \psi_3 \)) and weighted superposition operations performed directly in the latent spaces of both VAE and Flow models, generating novel quantum states with interpretable properties (see `latent_space_arithmetic.png`, `quantum_superpositions.png`).
 
+**3.4 Unitary HNN vs Standard HNN Comparison**
+
+Our comparative analysis of Unitary Hamiltonian Neural Networks and standard HNNs revealed surprising results that challenge some theoretical assumptions about the benefits of unitary transformations in neural networks for quantum systems.
+
+**3.4.1 Performance Metrics**
+
+![HNN Loss Comparison](images/comparisons/hnn_loss_comparison.png)
+*Figure 10: Training loss comparison between Unitary HNN and Standard HNN over 600 epochs. The standard HNN consistently achieves lower loss values despite its simpler architecture.*
+
+![HNN Dynamics Comparison](images/comparisons/hnn_dynamics_comparison.png)
+*Figure 11: Dynamics comparison showing trajectory predictions and energy conservation. The top row shows position (q) and momentum (p) over time, while the bottom row shows the energy values. The analytical solution (blue) serves as ground truth.*
+
+**3.4.2 Analysis of Performance Differences**
+
+Despite the theoretical advantages of unitary transformations for quantum systems, our experiments show that the standard HNN outperforms the Unitary HNN in practice. Several factors contribute to this unexpected result:
+
+1. **Architectural Constraints**:
+   - The Unitary HNN uses unitary transformations that preserve norm and are constrained to be orthogonal. While this is mathematically elegant and physically motivated for quantum systems, it restricts the model's expressivity compared to the standard HNN.
+   - The standard HNN has more flexibility in its weight space since it doesn't have the orthogonality constraint.
+
+2. **Optimization Challenges**:
+   - Unitary networks are notoriously difficult to optimize. The projection step (project_unitaries()) that enforces the unitary constraint can make the optimization landscape more complex and harder to navigate.
+   - This projection might be disrupting the gradient flow during training, leading to slower convergence or suboptimal solutions.
+
+3. **Model Complexity vs. Data Complexity**:
+   - The Unitary HNN might be overparameterized for the quantum harmonic oscillator problem, which has a relatively simple analytical solution.
+   - The standard HNN's simpler architecture might be better matched to the complexity of the problem.
+
+4. **Training Procedure Differences**:
+   - Looking at the training code, there might be subtle differences in how the two models are trained, including batch sizes, learning rates, or optimization algorithms.
+   - The Unitary HNN requires special handling (projection to the unitary group) that the standard HNN doesn't need.
+
+5. **Basis Transformation Issues**:
+   - The Unitary HNN is designed to learn basis transformations, but if the optimal basis for representing the Hamiltonian is close to the original basis, these transformations might not provide much benefit.
+
+**3.4.3 Theoretical Considerations**
+
+It's important to note that while unitary transformations are theoretically powerful for quantum systems, they don't always translate to better empirical performance in neural networks. The constraints they impose can sometimes outweigh their benefits, especially for simpler problems.
+
+For the quantum harmonic oscillator specifically, the Hamiltonian has a relatively simple form (H = p²/2 + q²/2), which might be easier for the standard HNN to learn directly rather than through basis transformations.
+
+**3.4.4 Potential Improvements**
+
+Based on our analysis, we propose several potential improvements to enhance the performance of Unitary HNN models:
+
+1. **Architectural Adjustments**: 
+   - Experiment with different numbers of unitary layers or hidden dimensions to find the optimal complexity for the problem
+   - Consider hybrid architectures that combine unitary and non-unitary components
+
+2. **Optimization Enhancements**:
+   - Test different learning rates or adaptive optimization algorithms specifically designed for constrained optimization
+   - Implement more sophisticated projection methods or relaxed unitary constraints
+
+3. **Regularization Strategies**:
+   - Add appropriate regularization to prevent overfitting and improve generalization
+   - Consider physics-informed regularization that incorporates domain knowledge
+
+4. **Initialization Techniques**:
+   - Develop better initialization strategies for unitary layers that place them closer to optimal solutions
+   - Explore orthogonal initialization methods from recent literature
+
+5. **Curriculum Learning**:
+   - Start with simpler examples and gradually increase complexity during training
+   - Pre-train on analytically solvable cases before fine-tuning on more complex scenarios
+
+This comparative study highlights an important lesson in scientific machine learning: theoretical advantages don't always translate to practical performance improvements, and the choice of model architecture should be guided by empirical results rather than theoretical elegance alone.
+
 **4. Discussion**
 
 Our framework successfully integrates numerical quantum simulation with various deep learning techniques, demonstrating their utility on the QHO testbed.

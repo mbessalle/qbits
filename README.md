@@ -237,6 +237,47 @@ Our analysis revealed the following energy conservation properties:
 These results demonstrate that hybrid approaches can effectively leverage the complementary strengths of HNN and LNN models. While the physics-constrained model achieves the best energy conservation through explicit constraints, the learning-based approaches show that neural networks can learn to preserve physical properties without explicit enforcement, which is more aligned with the goal of truly learning the underlying physics.
 </div>
 
+### Unitary HNN vs Standard HNN Comparison
+
+Our experiments comparing Unitary Hamiltonian Neural Networks with standard HNNs revealed interesting insights about the trade-offs between theoretical elegance and practical performance.
+
+#### Training Loss Comparison
+
+![HNN Loss Comparison](images/comparisons/hnn_loss_comparison.png)
+
+The training loss comparison shows that the standard HNN achieves lower loss values than the Unitary HNN, despite the latter's more sophisticated architecture.
+
+#### Dynamics Comparison
+
+![HNN Dynamics Comparison](images/comparisons/hnn_dynamics_comparison.png)
+
+The dynamics comparison demonstrates how each model performs in predicting trajectories and conserving energy compared to the analytical solution.
+
+#### Analysis of Performance Differences
+
+Despite the theoretical advantages of unitary transformations for quantum systems, our experiments show that the standard HNN outperforms the Unitary HNN in practice. Several factors contribute to this unexpected result:
+
+1. **Architectural Constraints**:
+   - The Unitary HNN uses unitary transformations that preserve norm and are constrained to be orthogonal. While this is mathematically elegant and physically motivated for quantum systems, it restricts the model's expressivity compared to the standard HNN.
+   - The standard HNN has more flexibility in its weight space since it doesn't have the orthogonality constraint.
+
+2. **Optimization Challenges**:
+   - Unitary networks are notoriously difficult to optimize. The projection step (project_unitaries()) that enforces the unitary constraint can make the optimization landscape more complex and harder to navigate.
+   - This projection might be disrupting the gradient flow during training, leading to slower convergence or suboptimal solutions.
+
+3. **Model Complexity vs. Data Complexity**:
+   - The Unitary HNN might be overparameterized for the quantum harmonic oscillator problem, which has a relatively simple analytical solution.
+   - The standard HNN's simpler architecture might be better matched to the complexity of the problem.
+
+4. **Training Procedure Differences**:
+   - Looking at the training code, there might be subtle differences in how the two models are trained, including batch sizes, learning rates, or optimization algorithms.
+   - The Unitary HNN requires special handling (projection to the unitary group) that the standard HNN doesn't need.
+
+5. **Basis Transformation Issues**:
+   - The Unitary HNN is designed to learn basis transformations, but if the optimal basis for representing the Hamiltonian is close to the original basis, these transformations might not provide much benefit.
+
+This comparison highlights an important lesson in scientific machine learning: theoretical advantages don't always translate to practical performance improvements, especially for simpler physical systems.
+
 ### Energy Conservation Comparison
 <div style="text-align: justify">
 The energy conservation comparison below shows how all models perform in maintaining the system's energy over time. While the HNN shows significant energy drift, the LNN, RK4 Combined, and Learned Hybrid models all maintain energy much closer to the true value, demonstrating the effectiveness of our hybrid approaches:

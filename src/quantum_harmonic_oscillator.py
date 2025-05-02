@@ -82,19 +82,41 @@ class QuantumHarmonicOscillator:
         """
         t_points = np.linspace(0, t_max, n_steps)
         
+        # Create a wrapper function that handles complex values correctly
+        def hamiltonian_wrapper(t, y_real):
+            # Convert real array [real_1, real_2, ..., imag_1, imag_2, ...] to complex
+            n = len(y_real) // 2
+            y_complex = y_real[:n] + 1j * y_real[n:]
+            
+            # Apply the Hamiltonian operator
+            dydt_complex = self._hamiltonian_operator(t, y_complex)
+            
+            # Convert complex result back to real array
+            dydt_real = np.concatenate([np.real(dydt_complex), np.imag(dydt_complex)])
+            return dydt_real
+        
+        # Convert initial complex wavefunction to real array
+        psi_0_real = np.concatenate([np.real(psi_0), np.imag(psi_0)])
+        
         # Solve the Schrödinger equation
         sol = solve_ivp(
-            self._hamiltonian_operator,
+            hamiltonian_wrapper,
             [0, t_max],
-            psi_0,
+            psi_0_real,
             t_eval=t_points,
             method='RK45',
             rtol=1e-6,
             atol=1e-8
         )
         
+        # Convert the solution back to complex form
+        n = len(psi_0)
+        psi_t_real = sol.y[:n, :]
+        psi_t_imag = sol.y[n:, :]
+        psi_t = psi_t_real + 1j * psi_t_imag
+        
         # Transpose to get shape (n_steps, n_points)
-        psi_t = sol.y.T
+        psi_t = psi_t.T
         
         return t_points, psi_t
     
